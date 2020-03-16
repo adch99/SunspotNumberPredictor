@@ -26,9 +26,8 @@ def log_config():
     configtxt = "\n".join([key + " : " + str(val) for (key, val) in config.items()]) + "\n" + layers
 
     print(configtxt)
-    with open("run_" + datetime.now().strftime("%y%m%d_%H%M") + ".log") as logfile:
+    with open("logs/run_" + datetime.now().strftime("%y%m%d_%H%M") + ".log") as logfile:
         logfile.write(configtxt)
-
 
 
 def trainer(net, x_train, y_train, x_val, y_val, verbose=0):

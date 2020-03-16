@@ -1,0 +1,14 @@
+# 2020/02/22 20:01
+
+Starting from scratch today with logs
+
+We begin with the config:
+mean_length = 31
+batch_size = 32
+timesteps = 10
+learning_rate = 0.001
+epochs = 5
+hidden_layer_size_1 = 64
+hidden_layer_size_2 = 64
+
+Starting off with 

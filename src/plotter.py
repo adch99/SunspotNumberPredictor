@@ -1,3 +1,4 @@
+from datetime import datetime as dt
 
 def plot_predictions():
     # Plot the prediction on the training and validation set
@@ -18,7 +19,7 @@ def plot_predictions():
     ax2.legend()
     ax2.set_title("Predicted vs Actual Training Data")
 
-    fig.savefig("/content/drive/My Drive/predictionvsreal_tanh_tanh_20200204_2layer.png", format="png")
+    fig.savefig("img/" + datetime.now().strftime("%y%m%d_%H%M") + "_predicted_vs_actual_data.png", format="png")
 
 def plot_loss_vs_epoch(history):
   # Plot training & validation loss values
@@ -31,7 +32,7 @@ def plot_loss_vs_epoch(history):
   plt.xlabel('Epoch')
   plt.legend(['Train', 'Validation'])
   # plt.ylim(bottom=0)
-  plotfilename = "img/" + datetime.now().strftime("%y%m%d")+ "_lr" + str(learning_rate) + "_epochs" + str(epochs) + "tanh_tanh" + "_2layer" + ".png"
+  plotfilename = "img/" + datetime.now().strftime("%y%m%d") + "_model_loss.png"
   plt.savefig(plotfilename)
   plt.show()
 
@@ -63,7 +64,7 @@ def learning_curve():
     plt.ylabel("Losses")
     plt.title("Model Loss")
     plt.legend()
-    plt.savefig("learning_curve20200117.png")
+    plt.savefig("img/" + datetime.now().strftime("%y%m%d_%H%M") + "_learning_curve.png")
     plt.show()
 
     return loss, val_loss
