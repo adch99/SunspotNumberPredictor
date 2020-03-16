@@ -23,6 +23,8 @@ def plot_predictions(net, x_train, y_train, x_val, y_val):
     ax2.legend()
     ax2.set_title("Predicted vs Actual Training Data")
 
+    plt.tight_layout()
+
     fig.savefig("img/" + datetime.now().strftime("%y%m%d_%H%M") + "_predicted_vs_actual_data.png", format="png")
 
 def plot_loss_vs_epoch(history, var_train, var_val):

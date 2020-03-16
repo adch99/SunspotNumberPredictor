@@ -7,17 +7,17 @@ from src.hyperparams import *
 
 # Creating the Network
 def create_network():
-    input_shape = (timesteps, n)
+    # weights = np.random.normal(hidden_layer_size_1*n, mu=0, sigma=1)
+    batch_input_shape = (batch_size, timesteps, n)
     net = Sequential()
-    net.add(LSTM(hidden_layer_size_1, input_shape=input_shape, batch_size=batch_size, stateful=True))
-    net.add(Dropout(0.5))
+    net.add(LSTM(hidden_layer_size_1, batch_input_shape=batch_input_shape, stateful=True, kernel_initializer='RandomNormal', bias_initializer='ones'))
     net.add(Activation("relu"))
     net.add(Dense(n))
-    net.add(Activation("tanh"))
+    net.add(Activation("relu"))
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
-    net.compile(loss=loss_func, optimizer=optimizer)
+    net.compile(loss=loss_func, optimizer="adam")
 
     return net
 
@@ -45,13 +45,15 @@ def log_config(net, history):
 
 def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
     #print('Training')
+    callback = keras.callbacks.callbacks.LambdaCallback(on_batch_end=lambda batch, logs: net.reset_states)
     history = net.fit(x_train,
           y_train,
           batch_size=batch_size,
           epochs=epochs,
           verbose=verbose,
           validation_data=(x_val, y_val),
-          shuffle=False)
+          shuffle=False,
+          callbacks=[callback])
 
 
     log_config(net, history)

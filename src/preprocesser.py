@@ -31,8 +31,10 @@ def preprocess(data):
     y = np.array(data["Daily Total Sunspot Number"])
 
     # Normalise the data
-    y = (y - np.mean(y)) / (6*np.sqrt(np.var(y)))
-    # y /= (6*np.sqrt(np.var(y)))
+    ymax = y.max()
+    ymin = y.min()
+    #y = (y - np.mean(y)) / (6*np.sqrt(np.var(y)))
+    y /= (ymax - ymin)/2
     x = x - x.min()
 
     print("x.shape:", x.shape)
