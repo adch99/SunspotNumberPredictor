@@ -1,4 +1,6 @@
 from datetime import datetime as dt
+import matplotlib.pyplot as plt
+from src.hyperparams import *
 
 def plot_predictions():
     # Plot the prediction on the training and validation set
@@ -23,48 +25,49 @@ def plot_predictions():
 
 def plot_loss_vs_epoch(history):
   # Plot training & validation loss values
-  plt.figure(figsize=(10, 8))
-  plt.grid(True)
-  plt.plot(history.history['loss']/var_train, marker="o")
-  plt.plot(history.history['val_loss']/var_val, marker="o")
-  plt.title('Model Loss')
-  plt.ylabel('Loss (Normalised to variance of dataset)')
-  plt.xlabel('Epoch')
-  plt.legend(['Train', 'Validation'])
-  # plt.ylim(bottom=0)
-  plotfilename = "img/" + datetime.now().strftime("%y%m%d") + "_model_loss.png"
-  plt.savefig(plotfilename)
-  plt.show()
+    plt.figure(figsize=(10, 8))
+    plt.grid(True)
+    plt.plot(history.history['loss']/var_train, marker="o")
+    plt.plot(history.history['val_loss']/var_val, marker="o")
+    plt.title('Model Loss')
+    plt.ylabel('Loss (Normalised to variance of dataset)')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Validation'])
+    # plt.ylim(bottom=0)
+    plotfilename = "img/" + datetime.now().strftime("%y%m%d") + "_model_loss.png"
+    plt.savefig(plotfilename)
+    plt.show()
 
 def learning_curve():
-  loss = []
-  val_loss = []
-  data_size = []
+    loss = []
+    val_loss = []
+    data_size = []
 
-  x_slid, y_slid = sliding_window_main(x, y)
-  x_train, y_train, x_val, y_val, x_test, y_test = data_splitting_main(x_slid, y_slid)
-  m_tot = x_train.shape[0]
+    x_slid, y_slid = sliding_window_main(x, y)
+    x_train, y_train, x_val, y_val, x_test, y_test = data_splitting_main(x_slid, y_slid)
+    m_tot = x_train.shape[0]
 
-  batch_step = 50
-  try:
-    for m in range(batch_size, m_tot, batch_step*batch_size):
-      print("Training: ", m)
-      net = create_network()
-      history = trainer(net, x_train[:m], y_train[:m], x_val, y_val)
-      loss.append(history.history["loss"][-1])
-      val_loss.append(history.history["val_loss"][-1])
-      data_size.append(m)
-      print("Loss:", loss[-1])
-      print()
+    batch_step = 50
+    try:
+        for m in range(batch_size, m_tot, batch_step*batch_size):
+            print("Training: ", m)
+            net = create_network()
+            history = trainer(net, x_train[:m], y_train[:m], x_val, y_val)
+            loss.append(history.history["loss"][-1])
+            val_loss.append(history.history["val_loss"][-1])
+            data_size.append(m)
 
-  finally:
-    plt.plot(data_size, loss, label="Loss", marker="o")
-    plt.plot(data_size, val_loss, label="Val Loss", marker="o")
-    plt.xlabel("m")
-    plt.ylabel("Losses")
-    plt.title("Model Loss")
-    plt.legend()
-    plt.savefig("img/" + datetime.now().strftime("%y%m%d_%H%M") + "_learning_curve.png")
-    plt.show()
+        print("Loss:", loss[-1])
+        print()
+
+    finally:
+        plt.plot(data_size, loss, label="Loss", marker="o")
+        plt.plot(data_size, val_loss, label="Val Loss", marker="o")
+        plt.xlabel("m")
+        plt.ylabel("Losses")
+        plt.title("Model Loss")
+        plt.legend()
+        plt.savefig("img/" + datetime.now().strftime("%y%m%d_%H%M") + "_learning_curve.png")
+        plt.show()
 
     return loss, val_loss

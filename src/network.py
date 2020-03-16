@@ -1,16 +1,21 @@
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Activation, LSTM
+import tensorflow as tf
+from src.hyperparams import *
 
 # Creating the Network
 def create_network():
-  net = Sequential()
-  net.add(Dense(hidden_layer_size_1, input_shape=input_shape))
-  net.add(Dense(n))
+    input_shape = (timesteps, n)
+    net = Sequential()
+    net.add(Dense(hidden_layer_size_1, input_shape=input_shape, batch_size=batch_size, activation="linear"))
+    net.add(Dense(n))
 
-  loss_func = loss_func
-  optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
-  net.compile(loss=loss_func, optimizer=optimizer)
+    net.compile(loss=loss_func, optimizer=optimizer)
 
-  return net
+    return net
 
 def log_config():
     config = {
@@ -31,8 +36,8 @@ def log_config():
 
 
 def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
-  #print('Training')
-  history = net.fit(x_train,
+    #print('Training')
+    history = net.fit(x_train,
           y_train,
           batch_size=batch_size,
           epochs=epochs,
@@ -40,4 +45,4 @@ def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
           validation_data=(x_val, y_val),
           shuffle=False)
 
-  return history
+    return history

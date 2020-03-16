@@ -1,8 +1,11 @@
 import pandas as pd
+import numpy as np
 from scipy.signal import gaussian
 import src.preprocesser as pre
 import src.network as network
 import src.plotter as plotter
+from src.hyperparams import *
+
 # Getting the data
 headers = ["Year",
            "Month",
@@ -13,18 +16,8 @@ headers = ["Year",
            "No of observations",
            "Definitive/Provisional"
 ]
-
+filename = "data/SN_d_tot_V2.0.csv"
 data = pd.read_csv(filename, delimiter=";", names=headers)
-
-# Hyper-Parameters
-mean_length = 31
-batch_size = 32
-timesteps = 10
-learning_rate = 0.001
-epochs = 5
-hidden_layer_size_1 = 64
-hidden_layer_size_2 = 64
-loss_func = "mse"
 
 # Data Preprocessing
 x, y = pre.preprocess(data)
