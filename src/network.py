@@ -10,7 +10,8 @@ def create_network():
     input_shape = (timesteps, n)
     net = Sequential()
     net.add(Flatten())
-    net.add(Dense(hidden_layer_size_1, input_shape=input_shape))
+    net.add(Dense(hidden_layer_size_1, input_shape=input_shape,
+        activation="sigmoid"))
     net.add(Dense(n))
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)

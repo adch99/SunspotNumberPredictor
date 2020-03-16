@@ -22,7 +22,7 @@ data = pd.read_csv(filename, delimiter=";", names=headers)
 # Data Preprocessing
 x, y = pre.preprocess(data)
 weights = gaussian(M=mean_length, std=mean_length, sym=True)
-#y = pre.running_mean(y, weights)
+y = pre.running_mean_helper(y, weights)
 x_slid, y_slid = pre.sliding_window_main(x, y)
 x_train, y_train, x_val, y_val, x_test, y_test = pre.data_splitting_main(x_slid, y_slid)
 

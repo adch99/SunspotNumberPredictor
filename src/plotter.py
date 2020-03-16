@@ -34,7 +34,7 @@ def plot_loss_vs_epoch(history, var_train, var_val):
     plt.xlabel('Epoch')
     plt.legend(['Train', 'Validation'])
     # plt.ylim(bottom=0)
-    plotfilename = "img/" + datetime.now().strftime("%y%m%d") + "_model_loss.png"
+    plotfilename = "img/" + datetime.now().strftime("%y%m%d_%H%M") + "_model_loss.png"
     plt.savefig(plotfilename)
     plt.show()
 

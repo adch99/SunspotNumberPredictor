@@ -43,6 +43,17 @@ def preprocess(data):
 def running_mean(y, weights):
     return np.convolve(y, weights, mode="valid")
 
+def running_mean_helper(y, weights):
+    means = np.zeros(y.shape)
+    mean_len = len(weights)
+    assert len(y) > mean_len, "Length of y <= Length of weights!"
+
+    means[1-mean_len:] = y[1-mean_len:]
+    means[:1-mean_len] = running_mean(y, weights)
+
+    return means
+
+
 def sliding_window(x, timesteps):
     shape = (x.shape[0]-timesteps, timesteps, n)
     x_slid = np.zeros(shape)
