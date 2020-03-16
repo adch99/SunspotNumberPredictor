@@ -10,8 +10,10 @@ def create_network():
     input_shape = (timesteps, n)
     net = Sequential()
     net.add(Flatten())
-    net.add(Dense(hidden_layer_size_1, input_shape=input_shape,
-        activation="sigmoid"))
+    net.add(Dense(hidden_layer_size_1, input_shape=input_shape))
+    net.add(Activation("relu"))
+    net.add(Dense(hidden_layer_size_2))
+    net.add(Activation("relu"))
     net.add(Dense(n))
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
@@ -27,7 +29,8 @@ def log_config(net, history):
         "Timesteps" : timesteps,
         "Learning Rate" : learning_rate,
         "Epochs" : epochs,
-        "Loss Function": loss_func
+        "Loss Function": loss_func,
+        "Mean Type": mean_type
     }
 
     configtxt = "\n".join([key + " : " + str(val) for (key, val) in config.items()])
