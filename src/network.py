@@ -1,6 +1,6 @@
 import keras
 from keras.models import Sequential
-from keras.layers import Dense, Activation, LSTM, Flatten
+from keras.layers import Dense, Activation, LSTM, Flatten, Dropout
 import tensorflow as tf
 from datetime import datetime
 from src.hyperparams import *
@@ -9,12 +9,11 @@ from src.hyperparams import *
 def create_network():
     input_shape = (timesteps, n)
     net = Sequential()
-    net.add(Flatten())
-    net.add(Dense(hidden_layer_size_1, input_shape=input_shape))
-    net.add(Activation("relu"))
-    net.add(Dense(hidden_layer_size_2))
+    net.add(LSTM(hidden_layer_size_1, input_shape=input_shape, batch_size=batch_size, stateful=True))
+    net.add(Dropout(0.5))
     net.add(Activation("relu"))
     net.add(Dense(n))
+    net.add(Activation("tanh"))
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 

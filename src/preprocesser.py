@@ -32,6 +32,7 @@ def preprocess(data):
 
     # Normalise the data
     y = (y - np.mean(y)) / (6*np.sqrt(np.var(y)))
+    # y /= (6*np.sqrt(np.var(y)))
     x = x - x.min()
 
     print("x.shape:", x.shape)
