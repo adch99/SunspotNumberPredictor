@@ -3,4 +3,4 @@ default:
 	less logs/errors.txt
 
 clean:
-	rm src/*.pyc
+	rm src/__pycache__/*.pyc
