@@ -57,6 +57,9 @@ def to_sliding_window(x, y, timesteps):
     xnew = sliding_window(x, timesteps)
     #print(xnew)
     ynew = y[timesteps:]
+    # print("y:", y.shape)
+    # print("xnew:", xnew.shape)
+    # print("ynew:", ynew.shape)
     return xnew, ynew
 
 def batch_adjustment(x, y, batch_size):
@@ -71,9 +74,14 @@ def sliding_window_main(x, y):
     learning curves.
     """
     x_slid, y_slid = to_sliding_window(x, y, timesteps)
+    # print("Before reshaping y_slid:")
+    # print("x_slid.shape:", x_slid.shape)
+    # print("y_slid.shape:", y_slid.shape)
+
     reshape_2 = lambda y: np.reshape(y, (y.shape[0], n))
     y_slid = reshape_2(y_slid)
 
+    # print("After reshaping y_slid")
     print("x_slid.shape:", x_slid.shape)
     print("y_slid.shape:", y_slid.shape)
 

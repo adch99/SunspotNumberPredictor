@@ -1,14 +1,16 @@
 import keras
 from keras.models import Sequential
-from keras.layers import Dense, Activation, LSTM
+from keras.layers import Dense, Activation, LSTM, Flatten
 import tensorflow as tf
+from datetime import datetime
 from src.hyperparams import *
 
 # Creating the Network
 def create_network():
     input_shape = (timesteps, n)
     net = Sequential()
-    net.add(Dense(hidden_layer_size_1, input_shape=input_shape, batch_size=batch_size, activation="linear"))
+    net.add(Flatten())
+    net.add(Dense(hidden_layer_size_1, input_shape=input_shape))
     net.add(Dense(n))
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
@@ -17,7 +19,7 @@ def create_network():
 
     return net
 
-def log_config():
+def log_config(net, history):
     config = {
         "Running Mean Length" : mean_length,
         "Batch Size" : batch_size,
@@ -27,11 +29,14 @@ def log_config():
         "Loss Function": loss_func
     }
 
-    layers = "Hidden Layer : " + str(hidden_layer_size_1)
-    configtxt = "\n".join([key + " : " + str(val) for (key, val) in config.items()]) + "\n" + layers
+    configtxt = "\n".join([key + " : " + str(val) for (key, val) in config.items()])
 
-    print(configtxt)
-    with open("logs/run_" + datetime.now().strftime("%y%m%d_%H%M") + ".log") as logfile:
+    historytxt = "\n".join([key + " : " + str(val[-1]) for (key, val) in history.history.items()])
+
+    configtxt = "\n" + configtxt + "\n" + historytxt
+
+    with open("logs/run_" + datetime.now().strftime("%y%m%d_%H%M") + ".log", "w") as logfile:
+        net.summary(print_fn=lambda x: logfile.write(x + "\n"))
         logfile.write(configtxt)
 
 
@@ -44,5 +49,8 @@ def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
           verbose=verbose,
           validation_data=(x_val, y_val),
           shuffle=False)
+
+
+    log_config(net, history)
 
     return history

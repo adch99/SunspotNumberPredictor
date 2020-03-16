@@ -1,8 +1,8 @@
-from datetime import datetime as dt
+from datetime import datetime
 import matplotlib.pyplot as plt
 from src.hyperparams import *
 
-def plot_predictions():
+def plot_predictions(net, x_train, y_train, x_val, y_val):
     # Plot the prediction on the training and validation set
     fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(20, 30))
     pred1 = net.predict(x_val, batch_size=batch_size)
@@ -23,8 +23,8 @@ def plot_predictions():
 
     fig.savefig("img/" + datetime.now().strftime("%y%m%d_%H%M") + "_predicted_vs_actual_data.png", format="png")
 
-def plot_loss_vs_epoch(history):
-  # Plot training & validation loss values
+def plot_loss_vs_epoch(history, var_train, var_val):
+    # Plot training & validation loss values
     plt.figure(figsize=(10, 8))
     plt.grid(True)
     plt.plot(history.history['loss']/var_train, marker="o")
