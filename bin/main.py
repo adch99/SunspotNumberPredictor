@@ -18,19 +18,12 @@ headers = ["Year",
            "Definitive/Provisional"
 ]
 filename = "data/SN_d_tot_V2.0.csv"
-#data = pd.read_csv(filename, delimiter=";", names=headers)[:1000]
-
-def parser(x):
-	return datetime.strptime('190'+x, '%Y-%m')
-series = pd.read_csv('shampoo-sales.csv', header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
-# summarize first few rows
-print(series.head())
-data = series.values
+data = pd.read_csv(filename, delimiter=";", names=headers)[:1000]
 
 # Data Preprocessing
 x, y = pre.preprocess(data)
 
-y_ori = y.copy()
+# y_ori = y.copy()
 
 
 if mean_type == "gaussian":

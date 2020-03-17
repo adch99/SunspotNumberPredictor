@@ -4,7 +4,7 @@ import numpy as np
 n = 1 # Number of features
 mean_length = 30
 batch_size = 1
-timesteps = 1
+timesteps = 5
 learning_rate = 1
 epochs = 20
 hidden_layer_size_1 = 4
