@@ -4,3 +4,4 @@ src/.ipynb_checkpoints/*
 src/__pycache__/
 logs/errors.txt
 */__init__.py
+src/*.ipynb
