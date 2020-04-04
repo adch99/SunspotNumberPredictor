@@ -1,7 +1,7 @@
 import numpy as np
 
 # Hyper-Parameters
-n = 1 # Number of features
+n = 2 # Number of features
 mean_length = 30
 batch_size = 1
 timesteps = 5

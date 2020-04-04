@@ -26,13 +26,13 @@ x, y = pre.preprocess(data)
 # y_ori = y.copy()
 
 
-if mean_type == "gaussian":
-    weights = gaussian(M=mean_length, std=0.1, sym=True)
-    weights /= np.sum(weights) # normalise the weights
-    y = pre.running_mean_helper(y, weights)
-elif mean_type == "uniform":
-    weights = np.ones(mean_length)/mean_length
-    y = pre.running_mean_helper(y, weights)
+# if mean_type == "gaussian":
+#     weights = gaussian(M=mean_length, std=0.1, sym=True)
+#     weights /= np.sum(weights) # normalise the weights
+#     y = pre.running_mean_helper(y, weights)
+# elif mean_type == "uniform":
+#     weights = np.ones(mean_length)/mean_length
+#     y = pre.running_mean_helper(y, weights)
     # y1 = y.copy()
     # y = pre.running_mean_helper(y, weights)
     # y2 = y.copy()
@@ -40,9 +40,8 @@ elif mean_type == "uniform":
     # y3 = y.copy()
     # y = pre.running_mean_helper(y, weights)
     # y4 = y.copy()
-
-else:
-    pass
+# else:
+#     pass
 
 # debug
 # plt.plot(x, y_ori, label="original", alpha=0.5)
@@ -53,8 +52,12 @@ else:
 # plt.legend()
 # plt.show()
 
-x_slid, y_slid = pre.sliding_window_main(x, y)
+X = np.array([x, y]).T
+
+x_slid, y_slid = pre.sliding_window_main(X, X)
 x_train, y_train, x_val, y_val, x_test, y_test = pre.data_splitting_main(x_slid, y_slid)
+
+
 
 net = network.create_network()
 
