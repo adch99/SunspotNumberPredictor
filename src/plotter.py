@@ -6,18 +6,22 @@ def plot_predictions(net, x_train, y_train, x_val, y_val):
     # Plot the prediction on the training and validation set
     fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(20, 30))
     pred1 = net.predict(x_val, batch_size=batch_size)
-    ax1.plot(y_val, label="Actual Data")
-    ax1.plot(pred1, label="Prediction")
-    ax1.set_ylim(-1, 1)
+    index_list = pred1[:, 0].argsort()
+    pred1 = pred1[:, index_list]
+    ax1.plot(y_val[:, 0], y_val[:, 1], label="Actual Data", marker="+")
+    ax1.plot(pred1[:, 0], pred1[:, 1], label="Prediction", marker="o")
+    ax1.set_ylim(-0.1, 1.1)
     ax1.set_xlabel("Year")
     ax1.set_ylabel("Sunspot Numbers")
     ax1.legend()
     ax1.set_title("Predicted vs Actual Validation Data")
 
     pred2 = net.predict(x_train, batch_size=batch_size)
-    ax2.plot(y_train, label="Actual Data")
-    ax2.plot(pred2, label="Prediction")
-    ax2.set_ylim(-1, 1)
+    index_list = pred2[:, 0].argsort()
+    pred2 = pred2[:, index_list]
+    ax2.plot(y_train[:, 0], y_train[:, 1], label="Actual Data", marker="+")
+    ax2.plot(pred2[:, 0], pred2[:, 1], label="Prediction", marker="o")
+    ax2.set_ylim(-0.1, 1.1)
     ax2.set_xlabel("Year")
     ax2.set_ylabel("Sunspot Numbers")
     ax2.legend()

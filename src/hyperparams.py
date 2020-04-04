@@ -4,9 +4,9 @@ import numpy as np
 n = 2 # Number of features
 mean_length = 30
 batch_size = 1
-timesteps = 5
+timesteps = 10
 learning_rate = 1
-epochs = 20
+epochs = 10
 hidden_layer_size_1 = 4
 hidden_layer_size_2 = 4
 loss_func = "mse"

@@ -18,7 +18,7 @@ headers = ["Year",
            "Definitive/Provisional"
 ]
 filename = "data/SN_d_tot_V2.0.csv"
-data = pd.read_csv(filename, delimiter=";", names=headers)[:1000]
+data = pd.read_csv(filename, delimiter=";", names=headers)[:10000]
 
 # Data Preprocessing
 x, y = pre.preprocess(data)
@@ -33,13 +33,13 @@ x, y = pre.preprocess(data)
 # elif mean_type == "uniform":
 #     weights = np.ones(mean_length)/mean_length
 #     y = pre.running_mean_helper(y, weights)
-    # y1 = y.copy()
-    # y = pre.running_mean_helper(y, weights)
-    # y2 = y.copy()
-    # y = pre.running_mean_helper(y, weights)
-    # y3 = y.copy()
-    # y = pre.running_mean_helper(y, weights)
-    # y4 = y.copy()
+#     # y1 = y.copy()
+#     # y = pre.running_mean_helper(y, weights)
+#     # y2 = y.copy()
+#     # y = pre.running_mean_helper(y, weights)
+#     # y3 = y.copy()
+#     # y = pre.running_mean_helper(y, weights)
+#     # y4 = y.copy()
 # else:
 #     pass
 
