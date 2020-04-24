@@ -1,7 +1,11 @@
+# import os
+# os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
+
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM, Flatten, Dropout
-import tensorflow as tf
+from keras.optimizers import Adam
+# import tensorflow as tf
 from datetime import datetime
 from src.hyperparams import *
 
@@ -15,9 +19,9 @@ def create_network():
     net.add(Dense(n))
     net.add(Activation("relu"))
 
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+    optimizer = Adam(lr=learning_rate)
 
-    net.compile(loss=loss_func, optimizer="adam")
+    net.compile(loss=loss_func, optimizer=optimizer)
 
     return net
 

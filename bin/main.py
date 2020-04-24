@@ -1,3 +1,6 @@
+# import os
+# os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,6 +9,7 @@ import src.preprocesser as pre
 import src.network as network
 import src.plotter as plotter
 from src.hyperparams import *
+
 
 # Getting the data
 headers = ["Year",
