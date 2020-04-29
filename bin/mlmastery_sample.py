@@ -1,7 +1,7 @@
 # LSTM for international airline passengers problem with regression framing
 import numpy
 import matplotlib.pyplot as plt
-from pandas import read_csv, DataFrame
+from pandas import read_csv
 import math
 from keras.models import Sequential
 from keras.layers import Dense
@@ -17,30 +17,11 @@ def create_dataset(dataset, look_back=1):
 		dataY.append(dataset[i + look_back, 0])
 	return numpy.array(dataX), numpy.array(dataY)
 # fix random seed for reproducibility
-numpy.random.seed(7)
-
+# numpy.random.seed(7)
 # load the dataset
-# Getting the data
-headers = ["Year",
-           "Month",
-           "Day",
-           "Decimal Date",
-           "Daily Total Sunspot Number",
-           "Sunspot Number Stddev",
-           "No of observations",
-           "Definitive/Provisional"
-]
-filename = "data/SN_d_tot_V2.0.csv"
-data = read_csv(filename, delimiter=";", names=headers)[:1000]
-data = data.dropna()
-dataframe = DataFrame(data=[data["Decimal Date"], data["Daily Total Sunspot Number"]])
-
-# dataframe = read_csv('airline-passengers.csv', usecols=[1], engine='python')
+dataframe = read_csv('data/airline-passengers.csv', usecols=[1], engine='python')
 dataset = dataframe.values
 dataset = dataset.astype('float32')
-
-
-
 # normalize the dataset
 scaler = MinMaxScaler(feature_range=(0, 1))
 dataset = scaler.fit_transform(dataset)
