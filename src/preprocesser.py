@@ -23,19 +23,22 @@ def preprocess(data):
     y = np.array(data["Daily Total Sunspot Number"])
 
     # Interpolate and fill in the missing data
-    interp = interp1d(x[~mask], y[~mask], kind="linear", bounds_error=False)
+    interp = interp1d(x[~mask], y[~mask], kind="linear", fill_value="extrapolate")
     data.loc[mask, "Daily Total Sunspot Number"] = interp(x[mask])
 
     # Update the variables
     x = np.array(data["Decimal Date"])
     y = np.array(data["Daily Total Sunspot Number"])
 
+    print(y[-10:])
+
     # Normalise the data
     ymax = y.max()
     ymin = y.min()
     #y = (y - np.mean(y)) / (6*np.sqrt(np.var(y)))
     y /= (ymax - ymin)/2
-    x = x - x.min()
+    # x = x - x.min()
+    print("ymax:", ymax, "ymin:", ymin)
 
     print("x.shape:", x.shape)
     print("y.shape:", y.shape)
@@ -141,5 +144,3 @@ def data_splitting_main(x_slid, y_slid):
     print()
 
     return x_train, y_train, x_val, y_val, x_test, y_test
-
-
