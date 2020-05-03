@@ -47,6 +47,9 @@ def preprocess(data):
 
     return x, y
 
+def invert_scaling(pred, scaler):
+    return scaler * pred
+
 # Smoothen the data by taking a running mean.
 def running_mean(y, weights):
     return np.convolve(y, weights, mode="valid")
@@ -125,7 +128,6 @@ def split_data(x, y, ratio, index=None):
     val_start = batch_size * ((splitter[0] * m) // batch_size)
     test_start = batch_size * ((splitter[1] * m) // batch_size)
     test_end = batch_size * ((splitter[2] * m) // batch_size)
-    if index:
 
     val_start = int(val_start)
     test_start = int(test_start)
@@ -141,6 +143,7 @@ def split_data(x, y, ratio, index=None):
         )
 
 
+
     else:
         split = ( x[train_start:val_start, :], y[train_start:val_start, :],
                x[val_start:test_start, :], y[val_start:test_start, :],
@@ -154,10 +157,10 @@ def data_splitting_main(x_slid, y_slid, idx_slid):
     Just a wrapper function to allow use during iteration while making
     learning curves.
     """
-    args = (x_slid, y_slid, idx_slid, data_split_ratio)
+    args = (x_slid, y_slid, data_split_ratio, idx_slid)
 
-    (x_train, y_train, idx_train
-        x_val, y_val, idx_val
+    (x_train, y_train, idx_train,
+        x_val, y_val, idx_val,
         x_test, y_test, idx_test) = split_data(*args)
 
     print('x_train.shape: ', x_train.shape)
@@ -168,7 +171,9 @@ def data_splitting_main(x_slid, y_slid, idx_slid):
     print('idx_val.shape: ', idx_val.shape)
     print('x_test.shape: ', x_test.shape)
     print('y_test.shape: ', y_test.shape)
-    print('idx_test.shape: ' idx_test.shape)
+    print('idx_test.shape: ', idx_test.shape)
     print()
 
-    return x_train, y_train, idx_train, x_val, y_val, idx_val, x_test, y_test, idx_
+    return (x_train, y_train, idx_train,
+        x_val, y_val, idx_val,
+        x_test, y_test, idx_test)
