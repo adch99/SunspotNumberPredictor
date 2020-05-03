@@ -36,12 +36,14 @@ def preprocess(data):
     ymax = y.max()
     ymin = y.min()
     #y = (y - np.mean(y)) / (6*np.sqrt(np.var(y)))
-    y /= (ymax - ymin)/2
+    scaler = (ymax - ymin)/2
+    y /= scaler
     # x = x - x.min()
     print("ymax:", ymax, "ymin:", ymin)
 
     print("x.shape:", x.shape)
     print("y.shape:", y.shape)
+    print("y values scaler:", scaler)
 
     return x, y
 
@@ -69,15 +71,22 @@ def sliding_window(x, timesteps):
 
     return x_slid
 
-def to_sliding_window(x, y, timesteps):
-    # Gets the sliding window version of x and cuts the y data appropriately
+def to_sliding_window(x, y, timesteps, index=None):
+    """
+    Gets the sliding window version of x and cuts the y data
+    appropriately. Cuts the indexing list (date) also
+    appropriately if given.
+    """
+
     xnew = sliding_window(x, timesteps)
     #print(xnew)
     ynew = y[timesteps:]
-    # print("y:", y.shape)
-    # print("xnew:", xnew.shape)
-    # print("ynew:", ynew.shape)
-    return xnew, ynew
+
+    if index is not None:
+        idxnew = index[timesteps:]
+        return xnew, ynew, idxnew
+
+    return xnew, ynew, None
 
 def batch_adjustment(x, y, batch_size):
     assert x.shape[0] == y.shape[0], "x and y are not of same length (dim 0) x:%s y:%s" % (x.shape, y.shape)
@@ -85,27 +94,27 @@ def batch_adjustment(x, y, batch_size):
     lnew = int((l // batch_size) * batch_size)
     return x[:lnew], y[:lnew]
 
-def sliding_window_main(x, y):
+def sliding_window_main(x, y, index=None):
     """
-    Just a wrapper function to allow use during iteration while making
-    learning curves.
+    Just a wrapper function to allow use during iteration
+    while making learning curves.
     """
-    x_slid, y_slid = to_sliding_window(x, y, timesteps)
-    # print("Before reshaping y_slid:")
-    # print("x_slid.shape:", x_slid.shape)
-    # print("y_slid.shape:", y_slid.shape)
+    x_slid, y_slid, idx_slid  = to_sliding_window(x, y, timesteps, index)
 
     reshape_2 = lambda y: np.reshape(y, (y.shape[0], n))
     y_slid = reshape_2(y_slid)
 
-    # print("After reshaping y_slid")
+
     print("x_slid.shape:", x_slid.shape)
     print("y_slid.shape:", y_slid.shape)
+
+    if index is not None:
+        return x_slid, y_slid, idx_slid
 
     return x_slid, y_slid
 
 # Data Splitting
-def split_data(x, y, ratio):
+def split_data(x, y, ratio, index=None):
     """
     Splits the data into training, validation and testing sets
     for x and y in the given ratio.
@@ -116,31 +125,50 @@ def split_data(x, y, ratio):
     val_start = batch_size * ((splitter[0] * m) // batch_size)
     test_start = batch_size * ((splitter[1] * m) // batch_size)
     test_end = batch_size * ((splitter[2] * m) // batch_size)
+    if index:
 
     val_start = int(val_start)
     test_start = int(test_start)
     test_end = int(test_end)
 
-    split = ( x[train_start:val_start, :], y[train_start:val_start, :],
-           x[val_start:test_start, :], y[val_start:test_start, :],
-           x[test_start:test_end, :], y[test_start:test_end, :]
-    )
+    if index is not None:
+        split = ( x[train_start:val_start, :], y[train_start:val_start, :],
+                index[train_start:val_start],
+                x[val_start:test_start, :], y[val_start:test_start, :],
+                index[val_start:test_start],
+                x[test_start:test_end, :], y[test_start:test_end, :],
+                index[test_start:test_end]
+        )
+
+
+    else:
+        split = ( x[train_start:val_start, :], y[train_start:val_start, :],
+               x[val_start:test_start, :], y[val_start:test_start, :],
+               x[test_start:test_end, :], y[test_start:test_end, :]
+        )
 
     return split
 
-def data_splitting_main(x_slid, y_slid):
+def data_splitting_main(x_slid, y_slid, idx_slid):
     """
     Just a wrapper function to allow use during iteration while making
     learning curves.
     """
-    x_train, y_train, x_val, y_val, x_test, y_test = split_data(x_slid, y_slid, data_split_ratio)
+    args = (x_slid, y_slid, idx_slid, data_split_ratio)
+
+    (x_train, y_train, idx_train
+        x_val, y_val, idx_val
+        x_test, y_test, idx_test) = split_data(*args)
 
     print('x_train.shape: ', x_train.shape)
     print('y_train.shape: ', y_train.shape)
+    print('idx_train.shape: ', idx_train.shape)
     print('x_val.shape: ', x_val.shape)
     print('y_val.shape: ', y_val.shape)
+    print('idx_val.shape: ', idx_val.shape)
     print('x_test.shape: ', x_test.shape)
     print('y_test.shape: ', y_test.shape)
+    print('idx_test.shape: ' idx_test.shape)
     print()
 
-    return x_train, y_train, x_val, y_val, x_test, y_test
+    return x_train, y_train, idx_train, x_val, y_val, idx_val, x_test, y_test, idx_

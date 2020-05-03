@@ -47,6 +47,8 @@ def log_config(net, history):
         net.summary(print_fn=lambda x: logfile.write(x + "\n"))
         logfile.write(configtxt)
 
+    net.save("models/run_" + datetime.now().strftime("%y%m%d_%H%M") + ".hdf5")
+
 
 def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
     #print('Training')
