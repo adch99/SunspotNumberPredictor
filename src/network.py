@@ -14,11 +14,8 @@ def create_network():
     # weights = np.random.normal(hidden_layer_size_1*n, mu=0, sigma=1)
     batch_input_shape = (batch_size, timesteps, n)
     net = Sequential()
-    # net.add(LSTM(hidden_layer_size_1, batch_input_shape=batch_input_shape, stateful=True, kernel_initializer='RandomNormal', bias_initializer='ones'))
     net.add(LSTM(hidden_layer_size_1, batch_input_shape=batch_input_shape))
-    # net.add(Activation("sigmoid"))
     net.add(Dense(n))
-    # net.add(Activation("sigmoid"))
 
     optimizer = Adadelta()
 
@@ -51,17 +48,32 @@ def log_config(net, history):
 
 
 def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
-    #print('Training')
-    callback = keras.callbacks.callbacks.LambdaCallback(on_batch_end=lambda batch, logs: net.reset_states)
+    """
+    Trains the given network with the given data.
+    Inputs
+    ------
+    net: Neural Network/Model instance
+    x_train: Training x data
+    y_train: Training y data
+    x_val: Validation x data
+    y_val: Validation y data
+    verbose: verbosity level for trainer [0, 1, 2]
+    (see keras.models.Sequential.fit for further info)
+
+    Outputs
+    -------
+    Returns history
+    history: network.history object from the network after the training.
+    """
+    #callback = keras.callbacks.callbacks.LambdaCallback(on_batch_end=lambda batch, logs: net.reset_states)
     history = net.fit(x_train,
           y_train,
           batch_size=batch_size,
           epochs=epochs,
           verbose=verbose,
           validation_data=(x_val, y_val),
-          shuffle=False,
-          callbacks=[callback])
-
+          shuffle=False)
+          #callbacks=[callback])
 
     log_config(net, history)
 

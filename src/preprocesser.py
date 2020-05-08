@@ -30,7 +30,7 @@ def preprocess(data):
     x = np.array(data["Decimal Date"])
     y = np.array(data["Daily Total Sunspot Number"])
 
-    print(y[-10:])
+    #print(y[-10:])
 
     # Normalise the data
     ymax = y.max()
@@ -45,10 +45,10 @@ def preprocess(data):
     print("y.shape:", y.shape)
     print("y values scaler:", scaler)
 
-    return x, y
+    inverse = lambda x: scaler * x
 
-def invert_scaling(pred, scaler):
-    return scaler * pred
+    return x, y, inverse
+
 
 # Smoothen the data by taking a running mean.
 def running_mean(y, weights):
