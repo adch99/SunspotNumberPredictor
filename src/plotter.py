@@ -3,14 +3,27 @@ import matplotlib.pyplot as plt
 from src.hyperparams import *
 
 def plot_predictions(net, x_train, y_train, idx_train, x_val, y_val, idx_val):
-    # Plot the prediction on the training and validation set
+    """
+    Plot the prediction on the training and validation set.
+    Inputs
+    -------
+    net: The neural network/model instance
+    x_train: Training x data
+    y_train: Training y data
+    idx_train: Indexing set for the training data (usually the date)
+    x_val: Validation x data
+    y_val: Validation y data
+    idx_val: Indexing set for the validation data (usually the date)
+
+    Outputs
+    -------
+    Returns None
+    Saves plot generated to
+    img/[current date & time]_predicted_vs_actual_data.png
+    """
     fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(20, 30))
     pred1 = net.predict(x_val, batch_size=batch_size)
-    # index_list = pred1[:, 0].argsort()
-    # pred1 = pred1[index_list, :]
     print("pred1.shape:", pred1.shape)
-    # ax1.plot(y_val[:, 0], y_val[:, 1], label="Actual Data", marker="+", linestyle="none")
-    # ax1.plot(pred1[:, 0], pred1[:, 1], label="Prediction", marker="o", linestyle="none")
     ax1.plot(idx_val, y_val, label="Actual Data", marker="+")
     ax1.plot(idx_val, pred1, label="Prediction", marker="o")
     # ax1.set_ylim(-0.1, 1.1)
@@ -21,10 +34,6 @@ def plot_predictions(net, x_train, y_train, idx_train, x_val, y_val, idx_val):
 
     pred2 = net.predict(x_train, batch_size=batch_size)
     print("pred2.shape:", pred2.shape)
-    # index_list = pred2[:, 0].argsort()
-    # pred2 = pred2[index_list, :]
-    # ax2.plot(y_train[:, 0], y_train[:, 1], label="Actual Data", marker="+", linestyle="none")
-    # ax2.plot(pred2[:, 0], pred2[:, 1], label="Prediction", marker="o", linestyle="none")
     ax2.plot(idx_train, y_train, label="Actual Data", marker="+")
     ax2.plot(idx_train, pred2, label="Prediction", marker="o")
     # ax2.set_ylim(-0.1, 1.1)
@@ -35,14 +44,25 @@ def plot_predictions(net, x_train, y_train, idx_train, x_val, y_val, idx_val):
 
     plt.tight_layout()
 
-    fig.savefig("img/" + datetime.now().strftime("%y%m%d_%H%M") + "_predicted_vs_actual_data.png", format="png")
-
-    # fig2 = plt.figure()
-    # plt.plot(np.diff(pred2), marker="o")
-    # plt.title("Successive differences in the value predictions for training set")
+    filename = "img/"
+    filename += datetime.now().strftime("%y%m%d_%H%M")
+    filename += "_predicted_vs_actual_data.png"
+    fig.savefig(filename, format="png")
 
 def plot_loss_vs_epoch(history, var_train, var_val):
-    # Plot training & validation loss values
+    """
+    Plot training & validation loss values.
+    Inputs
+    ------
+    history: The network.history object after training the network
+    var_train: Variance of the training y data
+    var_val: Variance of the validation y data
+
+    Outputs
+    -------
+    Returns None
+    Saves plot generated to img/[current date & time]_model_loss.png
+    """
     plt.figure(figsize=(10, 8))
     plt.grid(True)
     plt.plot(history.history['loss']/var_train, marker="o")
@@ -52,11 +72,17 @@ def plot_loss_vs_epoch(history, var_train, var_val):
     plt.xlabel('Epoch')
     plt.legend(['Train', 'Validation'])
     # plt.ylim(bottom=0)
-    plotfilename = "img/" + datetime.now().strftime("%y%m%d_%H%M") + "_model_loss.png"
-    plt.savefig(plotfilename)
+    filename = "img/"
+    filename += datetime.now().strftime("%y%m%d_%H%M")
+    filename += "_model_loss.png"
+    plt.savefig(filename)
     plt.show()
 
 def learning_curve():
+    """
+    Generates a 'learning curve' i.e. the analysis for each data size 0 to full.
+    Obsolete function.
+    """
     loss = []
     val_loss = []
     data_size = []
