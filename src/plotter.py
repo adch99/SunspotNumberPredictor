@@ -49,7 +49,7 @@ def plot_predictions(net, x_train, y_train, idx_train, x_val, y_val, idx_val):
     filename += "_predicted_vs_actual_data.png"
     fig.savefig(filename, format="png")
 
-def plot_loss_vs_epoch(history, var_train, var_val):
+def plot_loss_vs_epoch(history, var_train, var_val, show=True):
     """
     Plot training & validation loss values.
     Inputs
@@ -76,7 +76,9 @@ def plot_loss_vs_epoch(history, var_train, var_val):
     filename += datetime.now().strftime("%y%m%d_%H%M")
     filename += "_model_loss.png"
     plt.savefig(filename)
-    plt.show()
+
+    if show:
+        plt.show()
 
 def learning_curve():
     """

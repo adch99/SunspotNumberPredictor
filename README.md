@@ -18,3 +18,6 @@ In order to use this code to predict sunspots:
 
 * Python 3 (tested with 3.7.7)
 * libs: `numpy scipy pandas matplotlib tensorflow_gpu keras_gpu jupyter`
+
+## Notes
+* We have used **Adadelta** optimizer. You can use the **Adam** optimizer instead as well. Just change the trainer function in `src/network.py`. Both converge to the same overall minima, Adadelta converges from the top (underfits) while Adam converges from the bottom (overfits). 

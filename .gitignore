@@ -1,5 +1,7 @@
 *.png
+*.hdf5
 *.gitignore
+bin/.ipynb_checkpoints/*
 src/.ipynb_checkpoints/*
 src/__pycache__/
 logs/errors.txt
