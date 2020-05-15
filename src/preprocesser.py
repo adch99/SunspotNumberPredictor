@@ -36,7 +36,7 @@ def preprocess(data):
     ymax = y.max()
     ymin = y.min()
     #y = (y - np.mean(y)) / (6*np.sqrt(np.var(y)))
-    scaler = (ymax - ymin)/2
+    scaler = (ymax - ymin)
     y /= scaler
     # x = x - x.min()
     print("ymax:", ymax, "ymin:", ymin)

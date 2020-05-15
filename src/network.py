@@ -1,11 +1,10 @@
 # import os
 # os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
-
-import keras
-from keras.models import Sequential
-from keras.layers import Dense, Activation, LSTM, Flatten, Dropout, Lambda
-from keras.optimizers import Adam, Adadelta
-# import tensorflow as tf
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation, LSTM, Flatten, Dropout, Lambda
+from tensorflow.keras.optimizers import Adam, Adadelta
 from datetime import datetime
 from src.hyperparams import *
 
@@ -29,6 +28,7 @@ def create_network(layer_size=None, predictor=False):
 
     net = Sequential()
     net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
+    # net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
     net.add(Dense(n))
     # net.add(Activation("tanh"))
     # net.add(Lambda(lambda x:1.3*x))
@@ -81,7 +81,10 @@ def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
     Returns history
     history: network.history object from the network after the training.
     """
-    callback = keras.callbacks.callbacks.LambdaCallback(on_batch_end=lambda batch, logs: net.reset_states)
+    callback = keras.callbacks.LambdaCallback(on_batch_end=lambda batch, logs: net.reset_states)
+    log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
     history = net.fit(x_train,
           y_train,
           batch_size=batch_size,
@@ -89,7 +92,7 @@ def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
           verbose=verbose,
           validation_data=(x_val, y_val),
           shuffle=False,
-          callbacks=[callback])
+          callbacks=[callback, tensorboard_callback])
 
     log_config(net, history)
 
@@ -101,25 +104,31 @@ def predict_from_self(net, x_start, idx_start, idx_end, idx_step):
     # print("End index:", idx_end)
     # print("Index step:", idx_step)
     idx_pred = np.arange(idx_start[-1], idx_end, idx_step)
-    num_iters = len(idx_pred)
+    num_iters = len(idx_pred) + batch_size
 
-    pred = np.zeros(num_iters+batch_size, dtype=float)
+    pred = np.zeros(num_iters, dtype=np.float32)
     pred[:batch_size] = x_start[:, 0].reshape(batch_size)
     # print("x_start.shape:", x_start.shape)
 
-    # print("Going to enter the loop now.")
-    # print("num_iters:", num_iters)
-    # print("timesteps:", timesteps)
+    print("Going to enter the loop now.")
+    print("num_iters:", num_iters)
+    print("timesteps:", timesteps)
     for i in range(timesteps, num_iters):
-        # print("Hello!")
+        # print("Hello! i:", i)
         x = pred[i-timesteps:i].reshape(1, timesteps, n)
+        # x = np.around(x, 3)
         # print("i:", i, "x.shape:", x.shape)
+
+        # Lets add some stochasticity to this
+        #x *= np.random.normal(loc=1, scale=0.01)
+
         y = net.predict(x, batch_size=1)
         # print("y:", y)
         # print("y.shape:", y)
-        pred[i] = y
+        if i >= batch_size:
+            pred[i] = y
         # net.reset_states()
 
-    # print("Out of the loop now.")
+    print("Out of the loop now.")
 
     return pred[batch_size:], idx_pred

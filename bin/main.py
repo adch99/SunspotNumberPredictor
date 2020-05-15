@@ -25,44 +25,13 @@ filename = "data/SN_d_tot_V2.0.csv"
 data = pd.read_csv(filename, delimiter=";", names=headers)[:200]
 
 # Data Preprocessing
-x, y = pre.preprocess(data)
+dates, spots, inverter = pre.preprocess(data)
 
-# y_ori = y.copy()
+X = spots
+index = dates
+x_slid, y_slid, idx_slid = pre.sliding_window_main(X, X, index)
+x_train, y_train, idx_train, x_val, y_val, idx_val, x_test, y_test, idx_test = pre.data_splitting_main(x_slid, y_slid, idx_slid)
 
-
-# if mean_type == "gaussian":
-#     weights = gaussian(M=mean_length, std=0.1, sym=True)
-#     weights /= np.sum(weights) # normalise the weights
-#     y = pre.running_mean_helper(y, weights)
-# elif mean_type == "uniform":
-#     weights = np.ones(mean_length)/mean_length
-#     y = pre.running_mean_helper(y, weights)
-#     # y1 = y.copy()
-#     # y = pre.running_mean_helper(y, weights)
-#     # y2 = y.copy()
-#     # y = pre.running_mean_helper(y, weights)
-#     # y3 = y.copy()
-#     # y = pre.running_mean_helper(y, weights)
-#     # y4 = y.copy()
-# else:
-#     pass
-
-# debug
-# plt.plot(x, y_ori, label="original", alpha=0.5)
-# plt.plot(x, y1, label="1st smoothened", alpha=0.6)
-# plt.plot(x, y2, label="2nd smoothened", alpha=0.7)
-# plt.plot(x, y3, label="3rd smoothened", alpha=0.8)
-# plt.plot(x, y4, label="4th smoothened", alpha=0.9)
-# plt.legend()
-# plt.show()
-
-# X = np.array([x, y]).T
-X = y
-x_slid, y_slid = pre.sliding_window_main(X, X)
-x_train, y_train, x_val, y_val, x_test, y_test = pre.data_splitting_main(x_slid, y_slid)
-
-# plt.figure()
-# plt.scatter(x_train.flatten()[1:], y_train.flatten()[:-1])
 
 net = network.create_network()
 
@@ -72,8 +41,35 @@ var_val = np.var(y_val)
 print("Variance in y_train:", var_train)
 print("Variance in y_val:", var_val)
 
-plotter.plot_predictions(net, x_train, y_train, x_val, y_val)
+plotter.plot_predictions(net, x_train, y_train, idx_train, x_val, y_val, idx_val)
 plotter.plot_loss_vs_epoch(history, var_train, var_val)
 
+predictor = network.create_network(predictor=True)
+predictor.set_weights(net.get_weights())
 
-# loss, val_loss = learning_curve()
+idx_step = np.average(np.diff(idx_slid))
+x_start = x_val[:batch_size, :, :]
+idx_start = idx_val[:batch_size]
+idx_end = idx_val[-1]
+args = (
+    predictor,
+    x_start,
+    idx_start,
+    idx_end,
+    idx_step
+)
+predictor.reset_states()
+# net.reset_states()
+npred = predictor.predict(x_val, batch_size=1)
+rpred, idx_rpred = network.predict_from_self(*args)
+loss_func = keras.losses.MeanSquaredError()
+print("Loss: %.4f" % loss_func(y_val, rpred))
+
+plt.figure(figsize=(10,8))
+plt.plot(idx_val, y_val, label="Actual Value", marker="+")
+plt.plot(idx_rpred, rpred, label="Recursive Prediction", marker="o")
+plt.plot(idx_val, npred, label="Normal Prediction", marker="x")
+
+plt.xlabel("Date")
+plt.ylabel("Normalised Sunspot Numbers")
+plt.legend()
