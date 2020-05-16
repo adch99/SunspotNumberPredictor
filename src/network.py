@@ -27,14 +27,16 @@ def create_network(layer_size=None, predictor=False):
         batch_input_shape = (batch_size, timesteps, n)
 
     net = Sequential()
+    net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True,
+        return_sequences=True))
+    net.add(LSTM(hidden_layer_size_2, batch_input_shape=batch_input_shape, stateful=True,
+        return_sequences=True))
     net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
-    # net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
+
+    # net.add(Dense(layer_size, batch_input_shape=batch_input_shape))
     net.add(Dense(n))
-    # net.add(Activation("tanh"))
-    # net.add(Lambda(lambda x:1.3*x))
 
     optimizer = Adam(learning_rate=learning_rate)
-
     net.compile(loss=loss_func, optimizer=optimizer)
 
     return net
@@ -81,7 +83,7 @@ def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
     Returns history
     history: network.history object from the network after the training.
     """
-    callback = keras.callbacks.LambdaCallback(on_batch_end=lambda batch, logs: net.reset_states)
+    # reset_callback = keras.callbacks.LambdaCallback(on_batch_end=lambda batch, logs: net.reset_states)
     log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
@@ -92,42 +94,47 @@ def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
           verbose=verbose,
           validation_data=(x_val, y_val),
           shuffle=False,
-          callbacks=[callback, tensorboard_callback])
+          callbacks=[tensorboard_callback])
 
     log_config(net, history)
 
     return history
 
 def predict_from_self(net, x_start, idx_start, idx_end, idx_step):
-    # print("Predicting recursively")
-    # print("Start index:", idx_start[-1])
-    # print("End index:", idx_end)
-    # print("Index step:", idx_step)
+    """
+    Predicts the sequence recursively from the given starting point.
+
+    Inputs
+    ------
+    net: neural network model to predict with. Should have batch_size=1
+    x_start: The x values one batch_size prior to the starting point of
+        prediction.
+    idx_start: The indexing set corresponding to one batch_size prior to
+        the starting point of prediction.
+    idx_end: The index at the ending point of the prediction.
+    idx_step: The step value for the index. Sets the number of data points
+        to predict in the prediction.
+
+    Outputs
+    -------
+    pred: NumPy array of predictions generated recursively between
+        idx_start[-1] and idx_end.
+    idx_pred: The index for the predictions made.
+    """
     idx_pred = np.arange(idx_start[-1], idx_end, idx_step)
     num_iters = len(idx_pred) + batch_size
 
     pred = np.zeros(num_iters, dtype=np.float32)
     pred[:batch_size] = x_start[:, 0].reshape(batch_size)
-    # print("x_start.shape:", x_start.shape)
 
     print("Going to enter the loop now.")
     print("num_iters:", num_iters)
     print("timesteps:", timesteps)
     for i in range(timesteps, num_iters):
-        # print("Hello! i:", i)
         x = pred[i-timesteps:i].reshape(1, timesteps, n)
-        # x = np.around(x, 3)
-        # print("i:", i, "x.shape:", x.shape)
-
-        # Lets add some stochasticity to this
-        #x *= np.random.normal(loc=1, scale=0.01)
-
         y = net.predict(x, batch_size=1)
-        # print("y:", y)
-        # print("y.shape:", y)
         if i >= batch_size:
             pred[i] = y
-        # net.reset_states()
 
     print("Out of the loop now.")
 
