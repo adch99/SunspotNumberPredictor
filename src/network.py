@@ -27,8 +27,9 @@ def create_network(layer_size=None, predictor=False):
         batch_input_shape = (batch_size, timesteps, n)
 
     net = Sequential()
-    net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
-    #net.add(LSTM(hidden_layer_size_2, batch_input_shape=batch_input_shape, stateful=True))
+    net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True,
+        return_sequences=True))
+    net.add(LSTM(hidden_layer_size_2, batch_input_shape=batch_input_shape, stateful=True))
     # net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
 
     # net.add(Dense(layer_size, batch_input_shape=batch_input_shape))

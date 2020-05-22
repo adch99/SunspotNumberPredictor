@@ -34,9 +34,11 @@ elif mean_type == "uniform":
 else:
     pass
 
-X = np.diff(spots)
-index = dates[1:]
-for predict_ahead in range(0, 20):
+X = spots
+index = dates
+for i in range(0, 20):
+    global predict_ahead
+    predict_ahead = i
     x_slid, y_slid, idx_slid = pre.sliding_window_main(X, X, index=index, predict_ahead=predict_ahead)
     x_train, y_train, idx_train, x_val, y_val, idx_val, x_test, y_test, idx_test = pre.data_splitting_main(x_slid, y_slid, idx_slid, output=False)
 
