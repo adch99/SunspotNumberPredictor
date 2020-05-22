@@ -27,16 +27,14 @@ def create_network(layer_size=None, predictor=False):
         batch_input_shape = (batch_size, timesteps, n)
 
     net = Sequential()
-    net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True,
-        return_sequences=True))
-    net.add(LSTM(hidden_layer_size_2, batch_input_shape=batch_input_shape, stateful=True,
-        return_sequences=True))
+    net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
+    #net.add(LSTM(hidden_layer_size_2, batch_input_shape=batch_input_shape, stateful=True))
     # net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
 
     # net.add(Dense(layer_size, batch_input_shape=batch_input_shape))
     net.add(Dense(n))
 
-    optimizer = Adam(learning_rate=learning_rate)
+    optimizer = Adadelta()
     net.compile(loss=loss_func, optimizer=optimizer)
 
     return net
@@ -85,7 +83,8 @@ def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
     """
     # reset_callback = keras.callbacks.LambdaCallback(on_batch_end=lambda batch, logs: net.reset_states)
     log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-    tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+    # tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+    # stopping_callback = keras.callbacks.EarlyStopping(monitor="val_loss", patience=5)
 
     history = net.fit(x_train,
           y_train,
@@ -94,7 +93,7 @@ def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
           verbose=verbose,
           validation_data=(x_val, y_val),
           shuffle=False,
-          callbacks=[tensorboard_callback])
+          callbacks=[])
 
     log_config(net, history)
 
@@ -127,15 +126,15 @@ def predict_from_self(net, x_start, idx_start, idx_end, idx_step):
     pred = np.zeros(num_iters, dtype=np.float32)
     pred[:batch_size] = x_start[:, 0].reshape(batch_size)
 
-    print("Going to enter the loop now.")
-    print("num_iters:", num_iters)
-    print("timesteps:", timesteps)
+    # print("Going to enter the loop now.")
+    # print("num_iters:", num_iters)
+    # print("timesteps:", timesteps)
     for i in range(timesteps, num_iters):
         x = pred[i-timesteps:i].reshape(1, timesteps, n)
         y = net.predict(x, batch_size=1)
         if i >= batch_size:
             pred[i] = y
 
-    print("Out of the loop now.")
+    # print("Out of the loop now.")
 
     return pred[batch_size:], idx_pred

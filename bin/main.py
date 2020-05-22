@@ -22,7 +22,7 @@ headers = ["Year",
            "Definitive/Provisional"
 ]
 filename = "data/SN_d_tot_V2.0.csv"
-data = pd.read_csv(filename, delimiter=";", names=headers)[:200]
+data = pd.read_csv(filename, delimiter=";", names=headers)[:6000]
 
 # Data Preprocessing
 dates, spots, inverter = pre.preprocess(data)
@@ -44,32 +44,17 @@ print("Variance in y_val:", var_val)
 plotter.plot_predictions(net, x_train, y_train, idx_train, x_val, y_val, idx_val)
 plotter.plot_loss_vs_epoch(history, var_train, var_val)
 
+plotter.plot_weights(net)
+plt.close()
 predictor = network.create_network(predictor=True)
 predictor.set_weights(net.get_weights())
 
-idx_step = np.average(np.diff(idx_slid))
-x_start = x_val[:batch_size, :, :]
-idx_start = idx_val[:batch_size]
-idx_end = idx_val[-1]
 args = (
     predictor,
-    x_start,
-    idx_start,
-    idx_end,
-    idx_step
+    x_train,
+    y_train,
+    idx_train
 )
 predictor.reset_states()
-# net.reset_states()
-npred = predictor.predict(x_val, batch_size=1)
-rpred, idx_rpred = network.predict_from_self(*args)
-loss_func = keras.losses.MeanSquaredError()
-print("Loss: %.4f" % loss_func(y_val, rpred))
-
-plt.figure(figsize=(10,8))
-plt.plot(idx_val, y_val, label="Actual Value", marker="+")
-plt.plot(idx_rpred, rpred, label="Recursive Prediction", marker="o")
-plt.plot(idx_val, npred, label="Normal Prediction", marker="x")
-
-plt.xlabel("Date")
-plt.ylabel("Normalised Sunspot Numbers")
-plt.legend()
+plotter.plot_recursive_predictions(*args)
+plt.close()

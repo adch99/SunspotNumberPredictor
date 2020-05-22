@@ -65,8 +65,8 @@ def running_mean_helper(y, weights):
     return means
 
 
-def sliding_window(x, timesteps):
-    shape = (x.shape[0]-timesteps, timesteps, n)
+def sliding_window(x, timesteps, predict_ahead):
+    shape = (x.shape[0]-timesteps-predict_ahead, timesteps, n)
     x_slid = np.zeros(shape)
 
     for i in range(shape[0]):
@@ -74,19 +74,19 @@ def sliding_window(x, timesteps):
 
     return x_slid
 
-def to_sliding_window(x, y, timesteps, index=None):
+def to_sliding_window(x, y, timesteps, predict_ahead, index=None):
     """
     Gets the sliding window version of x and cuts the y data
     appropriately. Cuts the indexing list (date) also
     appropriately if given.
     """
 
-    xnew = sliding_window(x, timesteps)
+    xnew = sliding_window(x, timesteps, predict_ahead)
     #print(xnew)
-    ynew = y[timesteps:]
+    ynew = y[timesteps+predict_ahead:]
 
     if index is not None:
-        idxnew = index[timesteps:]
+        idxnew = index[timesteps+predict_ahead:]
         return xnew, ynew, idxnew
 
     return xnew, ynew, None
@@ -97,12 +97,15 @@ def batch_adjustment(x, y, batch_size):
     lnew = int((l // batch_size) * batch_size)
     return x[:lnew], y[:lnew]
 
-def sliding_window_main(x, y, index=None):
+def sliding_window_main(x, y, index=None, predict_ahead=predict_ahead):
     """
     Just a wrapper function to allow use during iteration
     while making learning curves.
     """
-    x_slid, y_slid, idx_slid  = to_sliding_window(x, y, timesteps, index)
+    x_slid, y_slid, idx_slid  = to_sliding_window(
+        x, y, timesteps,
+        predict_ahead,
+        index=index)
 
     reshape_2 = lambda y: np.reshape(y, (y.shape[0], n))
     y_slid = reshape_2(y_slid)
@@ -152,7 +155,7 @@ def split_data(x, y, ratio, index=None):
 
     return split
 
-def data_splitting_main(x_slid, y_slid, idx_slid):
+def data_splitting_main(x_slid, y_slid, idx_slid, output=True):
     """
     Just a wrapper function to allow use during iteration while making
     learning curves.
@@ -163,16 +166,17 @@ def data_splitting_main(x_slid, y_slid, idx_slid):
         x_val, y_val, idx_val,
         x_test, y_test, idx_test) = split_data(*args)
 
-    print('x_train.shape: ', x_train.shape)
-    print('y_train.shape: ', y_train.shape)
-    print('idx_train.shape: ', idx_train.shape)
-    print('x_val.shape: ', x_val.shape)
-    print('y_val.shape: ', y_val.shape)
-    print('idx_val.shape: ', idx_val.shape)
-    print('x_test.shape: ', x_test.shape)
-    print('y_test.shape: ', y_test.shape)
-    print('idx_test.shape: ', idx_test.shape)
-    print()
+    if output:
+        print('x_train.shape: ', x_train.shape)
+        print('y_train.shape: ', y_train.shape)
+        print('idx_train.shape: ', idx_train.shape)
+        print('x_val.shape: ', x_val.shape)
+        print('y_val.shape: ', y_val.shape)
+        print('idx_val.shape: ', idx_val.shape)
+        print('x_test.shape: ', x_test.shape)
+        print('y_test.shape: ', y_test.shape)
+        print('idx_test.shape: ', idx_test.shape)
+        print()
 
     return (x_train, y_train, idx_train,
         x_val, y_val, idx_val,
