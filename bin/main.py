@@ -1,6 +1,3 @@
-# import os
-# os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
