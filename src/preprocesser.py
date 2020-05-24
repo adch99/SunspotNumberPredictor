@@ -3,6 +3,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 from src.hyperparams import *
 
+
 def preprocess(data):
     # Set unknown numbers to NaN first
     mask = data["Daily Total Sunspot Number"] == -1
@@ -35,17 +36,18 @@ def preprocess(data):
     # Normalise the data
     ymax = y.max()
     ymin = y.min()
-    #y = (y - np.mean(y)) / (6*np.sqrt(np.var(y)))
-    scaler = (ymax - ymin)
-    y /= scaler
+    stddev = np.std(y)
+    mean = np.mean(y)
+    y = (y - mean) / stddev
+    scaler = stddev
+    # y /= scaler
     # x = x - x.min()
     print("ymax:", ymax, "ymin:", ymin)
 
     print("x.shape:", x.shape)
     print("y.shape:", y.shape)
-    print("y values scaler:", scaler)
 
-    inverse = lambda x: scaler * x
+    inverse = lambda x: scaler * x + mean
 
     return x, y, inverse
 

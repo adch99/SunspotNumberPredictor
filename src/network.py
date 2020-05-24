@@ -10,7 +10,6 @@ from src.hyperparams import *
 
 # Creating the Network
 def create_network(layer_size=None, predictor=False):
-
     # If we are iterating over this then use
     # provided layer_size
     if not layer_size:
@@ -27,9 +26,9 @@ def create_network(layer_size=None, predictor=False):
         batch_input_shape = (batch_size, timesteps, n)
 
     net = Sequential()
-    net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True,
-        return_sequences=True))
-    net.add(LSTM(hidden_layer_size_2, batch_input_shape=batch_input_shape, stateful=True))
+    net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
+    net.add(Dropout(0.5))
+    # net.add(LSTM(hidden_layer_size_2, batch_input_shape=batch_input_shape, stateful=True))
     # net.add(LSTM(layer_size, batch_input_shape=batch_input_shape, stateful=True))
 
     # net.add(Dense(layer_size, batch_input_shape=batch_input_shape))
@@ -62,6 +61,7 @@ def log_config(net, history):
         logfile.write(configtxt)
 
     net.save("models/run_" + datetime.now().strftime("%y%m%d_%H%M") + ".hdf5")
+
 
 
 def trainer(net, x_train, y_train, x_val, y_val, verbose=0):
@@ -119,10 +119,10 @@ def predict_from_self(net, x_start, idx_start, idx_end, idx_step):
     -------
     pred: NumPy array of predictions generated recursively between
         idx_start[-1] and idx_end.
-    idx_pred: The index for the predictions made.
     """
-    idx_pred = np.arange(idx_start[-1], idx_end, idx_step)
-    num_iters = len(idx_pred) + batch_size
+
+    idx_steps = (idx_end - idx_start[-1]) / idx_step
+    num_iters = int(np.ceil(idx_steps + batch_size))
 
     pred = np.zeros(num_iters, dtype=np.float32)
     pred[:batch_size] = x_start[:, 0].reshape(batch_size)
@@ -138,4 +138,4 @@ def predict_from_self(net, x_start, idx_start, idx_end, idx_step):
 
     # print("Out of the loop now.")
 
-    return pred[batch_size:], idx_pred
+    return pred[batch_size:]

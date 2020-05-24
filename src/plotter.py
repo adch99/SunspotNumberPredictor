@@ -171,17 +171,23 @@ def plot_recursive_predictions(predictor, x, y, idx, idx_end=None, show=False):
         idx_step
     )
 
-    npred = predictor.predict(x, batch_size=1)
-    rpred, idx_rpred = network.predict_from_self(*args)
+    idx_pred = idx[batch_size:] # Part of the index which has predictions
+    x_pred = x[batch_size:, :, :]
+    y_pred = y[batch_size:]
+
+
+    npred = predictor.predict(x_pred, batch_size=1)
+    rpred = network.predict_from_self(*args)
 
     fig = plt.figure(figsize=(10,8))
-    plt.plot(idx, y, label="Actual Value", marker="+")
-    plt.plot(idx_rpred, rpred, label="Recursive Prediction", marker="o")
-    plt.plot(idx, npred, label="Normal Prediction", marker="x")
+    plt.plot(idx_pred, y_pred, label="Actual Value", marker="+")
+    plt.plot(idx_pred, rpred, label="Recursive Prediction", marker="o")
+    plt.plot(idx_pred, npred, label="Direct Prediction", marker="x")
 
     plt.xlabel("Date")
     plt.ylabel("Normalised Sunspot Numbers")
-    plt.title("predict_ahead = %d" % predict_ahead)
+    plt.title("Comparison of Data with Forecasts")
+    # plt.title("predict_ahead = %d" % predict_ahead)
     plt.legend()
 
     filename = "img/"

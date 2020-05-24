@@ -19,7 +19,7 @@ headers = ["Year",
            "Definitive/Provisional"
 ]
 filename = "data/SN_d_tot_V2.0.csv"
-data = pd.read_csv(filename, delimiter=";", names=headers)
+data = pd.read_csv(filename, delimiter=";", names=headers)[:10000]
 
 # Data Preprocessing
 dates, spots, inverter = pre.preprocess(data)
